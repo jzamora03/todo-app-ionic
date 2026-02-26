@@ -35,3 +35,13 @@
     margin: 0 auto 12px;
   }
 }
+
+.stats-card {
+  background: linear-gradient(135deg, var(--ion-color-primary), #764ba2);
+  color: white;
+  .stat-item {
+    text-align: center;
+    h2 { font-size: 28px; font-weight: bold; color: white; margin: 0; }
+    p { color: rgba(255,255,255,0.8); margin: 0; font-size: 12px; }
+  }
+}

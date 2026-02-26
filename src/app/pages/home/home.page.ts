@@ -8,6 +8,7 @@ import { TodoService } from '../../services/todo.service';
 import { CategoryService } from '../../services/category.service';
 import { Todo } from '../../models/todo.model';
 import { Category } from '../../models/category.model';
+import { RemoteConfigService } from 'src/app/services/remote-config.service';
 
 @Component({
   selector: 'app-home',
@@ -29,8 +30,9 @@ export class HomePage implements OnInit {
     private todoService: TodoService,
     private categoryService: CategoryService,
     private alertCtrl: AlertController,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    public remoteConfigService: RemoteConfigService
+  ) { }
 
   ngOnInit() {
     combineLatest([
@@ -67,6 +69,10 @@ export class HomePage implements OnInit {
 
   getCategoryById(id: string | null): Category | undefined {
     return id ? this.categories.find(c => c.id === id) : undefined;
+  }
+
+  get completedCount(): number {
+    return this.todos.filter(t => t.completed).length;
   }
 
   trackById(_: number, item: Todo) { return item.id; }

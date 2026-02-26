@@ -9,6 +9,27 @@
   </ion-toolbar>
 </ion-header>
 
+<ion-card *ngIf="remoteConfigService.showStatistics$ | async" class="stats-card">
+  <ion-card-content>
+    <ion-grid>
+      <ion-row>
+        <ion-col class="stat-item">
+          <h2>{{ todos.length }}</h2>
+          <p>Total</p>
+        </ion-col>
+        <ion-col class="stat-item">
+          <h2>{{ todos.length - completedCount }}</h2>
+          <p>Pendientes</p>
+        </ion-col>
+        <ion-col class="stat-item">
+          <h2>{{ completedCount }}</h2>
+          <p>Completadas</p>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>
+
 <ion-content class="ion-padding">
 
   <!-- Filtro por categorías -->
