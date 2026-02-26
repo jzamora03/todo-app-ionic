@@ -1,0 +1,137 @@
+:host {
+  --bg: #F7F8FA;
+  --surface: #FFFFFF;
+  --text-primary: #1A1D23;
+  --text-secondary: #8A8F9E;
+  --accent: #5B6AF0;
+  --danger: #FF5C5C;
+  --radius: 16px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+ion-toolbar {
+  --background: var(--bg);
+  --border-width: 0;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 12px;
+}
+
+.header-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.add-btn-header {
+  --color: var(--accent);
+  font-size: 24px;
+}
+
+ion-content {
+  --background: var(--bg);
+  --padding-top: 8px;
+}
+
+.categories-wrapper {
+  padding: 0 20px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.category-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.category-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.category-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.category-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.category-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+
+  &.edit {
+    background: #EEF0FD;
+    color: var(--accent);
+  }
+
+  &.delete {
+    background: #FFF0F0;
+    color: var(--danger);
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 0 32px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.empty-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+
+.empty-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0 0 24px;
+}
+
+.create-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 100px;
+  padding: 12px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}

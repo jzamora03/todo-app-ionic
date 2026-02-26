@@ -17,6 +17,7 @@ import { RemoteConfigService } from 'src/app/services/remote-config.service';
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush
+
 })
 export class HomePage implements OnInit {
   todos: Todo[] = [];
@@ -26,6 +27,7 @@ export class HomePage implements OnInit {
   newTodoText: string = '';
   selectedNewTodoCategoryId: string | null = null;
 
+
   constructor(
     private todoService: TodoService,
     private categoryService: CategoryService,
@@ -33,6 +35,8 @@ export class HomePage implements OnInit {
     private cdr: ChangeDetectorRef,
     public remoteConfigService: RemoteConfigService
   ) { }
+
+  showSwipeHint = false;
 
   ngOnInit() {
     combineLatest([
@@ -45,6 +49,7 @@ export class HomePage implements OnInit {
       this.cdr.markForCheck();
     });
   }
+
 
   applyFilter() {
     this.filteredTodos = !this.selectedCategoryId
@@ -61,8 +66,30 @@ export class HomePage implements OnInit {
     if (this.newTodoText.trim()) {
       this.todoService.add(this.newTodoText.trim(), this.selectedNewTodoCategoryId);
       this.newTodoText = '';
+
+      // Mostrar hint solo la primera vez
+      const hintShown = localStorage.getItem('swipe_hint_shown');
+      if (!hintShown && this.todos.length === 1) {
+        setTimeout(() => {
+          this.showSwipeHint = true;
+          this.cdr.markForCheck();
+        }, 600);
+      }
     }
   }
+
+  dismissHint() {
+    this.showSwipeHint = false;
+    localStorage.setItem('swipe_hint_shown', 'true');
+    this.cdr.markForCheck();
+  }
+
+  // addTodo() {
+  //   if (this.newTodoText.trim()) {
+  //     this.todoService.add(this.newTodoText.trim(), this.selectedNewTodoCategoryId);
+  //     this.newTodoText = '';
+  //   }
+  // }
 
   toggleTodo(todo: Todo) { this.todoService.toggle(todo.id); }
   deleteTodo(todo: Todo) { this.todoService.delete(todo.id); }
@@ -74,6 +101,9 @@ export class HomePage implements OnInit {
   get completedCount(): number {
     return this.todos.filter(t => t.completed).length;
   }
+
+
+
 
   trackById(_: number, item: Todo) { return item.id; }
 }

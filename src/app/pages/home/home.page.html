@@ -1,109 +1,144 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>📝 Mis Tareas</ion-title>
-    <ion-buttons slot="end">
-      <ion-button routerLink="/categories">
-        <ion-icon slot="icon-only" name="pricetags-outline"></ion-icon>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="header-content">
+      <ion-button fill="clear" routerLink="/categories" class="categories-btn">
+        <ion-icon name="pricetags-outline"></ion-icon>
       </ion-button>
-    </ion-buttons>
+    </div>
   </ion-toolbar>
 </ion-header>
+<ion-content>
 
-<ion-card *ngIf="remoteConfigService.showStatistics$ | async" class="stats-card">
-  <ion-card-content>
-    <ion-grid>
-      <ion-row>
-        <ion-col class="stat-item">
-          <h2>{{ todos.length }}</h2>
-          <p>Total</p>
-        </ion-col>
-        <ion-col class="stat-item">
-          <h2>{{ todos.length - completedCount }}</h2>
-          <p>Pendientes</p>
-        </ion-col>
-        <ion-col class="stat-item">
-          <h2>{{ completedCount }}</h2>
-          <p>Completadas</p>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </ion-card-content>
-</ion-card>
-
-<ion-content class="ion-padding">
-
-  <!-- Filtro por categorías -->
-  <div class="filter-scroll">
-    <ion-chip
-      [class.active-chip]="selectedCategoryId === null"
-      (click)="filterBy(null)">
-      <ion-label>Todas</ion-label>
-    </ion-chip>
-    <ion-chip
-      *ngFor="let cat of categories"
-      [style.--color]="cat.color"
-      [class.active-chip]="selectedCategoryId === cat.id"
-      (click)="filterBy(cat.id)">
-      <ion-icon name="pricetag" [style.color]="cat.color"></ion-icon>
-      <ion-label>{{ cat.name }}</ion-label>
-    </ion-chip>
+  <!-- Feature Flag Firebase-->
+  <div class="stats-wrapper" *ngIf="remoteConfigService.showStatistics$ | async">
+    <div class="stats-card">
+      <div class="stat">
+        <span class="stat-number">{{ todos.length }}</span>
+        <span class="stat-label">Total</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-number pending">{{ todos.length - completedCount }}</span>
+        <span class="stat-label">Pendientes</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-number done">{{ completedCount }}</span>
+        <span class="stat-label">Listas</span>
+      </div>
+    </div>
   </div>
 
-  <!-- Formulario nueva tarea -->
-  <ion-card class="add-card">
-    <ion-card-content>
-      <ion-item lines="none">
-        <ion-input
-          [(ngModel)]="newTodoText"
-          placeholder="Nueva tarea..."
-          (keyup.enter)="addTodo()">
-        </ion-input>
-      </ion-item>
-      <ion-item lines="none">
-        <ion-label>Categoría</ion-label>
-        <ion-select [(ngModel)]="selectedNewTodoCategoryId" placeholder="Sin categoría">
+  <!-- Filtros -->
+  <div class="filters-wrapper">
+    <div class="filters-scroll">
+      <button
+        class="filter-chip"
+        [class.active]="selectedCategoryId === null"
+        (click)="filterBy(null)">
+        Todas
+      </button>
+      <button
+        *ngFor="let cat of categories"
+        class="filter-chip"
+        [class.active]="selectedCategoryId === cat.id"
+        [style.--chip-color]="cat.color"
+        (click)="filterBy(cat.id)">
+        <span class="chip-dot" [style.background]="cat.color"></span>
+        {{ cat.name }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Agregar tarea -->
+  <div class="add-task-wrapper">
+    <div class="add-task-card">
+      <ion-input
+        class="task-input"
+        [(ngModel)]="newTodoText"
+        placeholder="Añadir nueva tarea..."
+        (keyup.enter)="addTodo()">
+      </ion-input>
+      <div class="add-task-footer">
+        <ion-select
+          class="category-select"
+          [(ngModel)]="selectedNewTodoCategoryId"
+          placeholder="Sin categoría"
+          interface="popover">
           <ion-select-option [value]="null">Sin categoría</ion-select-option>
           <ion-select-option *ngFor="let cat of categories" [value]="cat.id">
             {{ cat.name }}
           </ion-select-option>
         </ion-select>
-      </ion-item>
-      <ion-button expand="block" (click)="addTodo()" class="ion-margin-top">
-        <ion-icon slot="start" name="add"></ion-icon>
-        Agregar Tarea
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+        <button class="add-btn" (click)="addTodo()" [disabled]="!newTodoText.trim()">
+          <ion-icon name="add"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </div>
 
-  <!-- Lista de tareas -->
-  <ion-list>
+  <!-- Lista -->
+  <div class="tasks-wrapper">
+    <p class="tasks-count" *ngIf="filteredTodos.length > 0">
+      {{ filteredTodos.length }} tarea{{ filteredTodos.length !== 1 ? 's' : '' }}
+    </p>
+
     <ion-item-sliding *ngFor="let todo of filteredTodos; trackBy: trackById">
-      <ion-item [class.completed-item]="todo.completed">
-        <ion-checkbox
-          slot="start"
-          [checked]="todo.completed"
-          (ionChange)="toggleTodo(todo)">
-        </ion-checkbox>
-        <ion-label>
-          <h2 [class.completed-text]="todo.completed">{{ todo.text }}</h2>
-          <p *ngIf="getCategoryById(todo.categoryId) as cat">
-            <ion-icon name="pricetag" [style.color]="cat.color"></ion-icon>
-            {{ cat.name }}
-          </p>
-        </ion-label>
+      <ion-item class="task-item" lines="none">
+        <div class="task-check" slot="start">
+          <button
+            class="check-btn"
+            [class.checked]="todo.completed"
+            (click)="toggleTodo(todo)">
+            <ion-icon name="checkmark" *ngIf="todo.completed"></ion-icon>
+          </button>
+        </div>
+        <div class="task-content">
+          <p class="task-text" [class.done]="todo.completed">{{ todo.text }}</p>
+          <div class="task-category" *ngIf="getCategoryById(todo.categoryId) as cat">
+            <span class="cat-dot" [style.background]="cat.color"></span>
+            <span class="cat-name">{{ cat.name }}</span>
+          </div>
+        </div>
       </ion-item>
       <ion-item-options side="end">
         <ion-item-option color="danger" (click)="deleteTodo(todo)">
-          <ion-icon slot="icon-only" name="trash"></ion-icon>
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
         </ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
-  </ion-list>
 
-  <!-- Estado vacío -->
-  <div *ngIf="filteredTodos.length === 0" class="empty-state">
-    <ion-icon name="checkmark-done-circle-outline"></ion-icon>
-    <p>No hay tareas aquí</p>
+    <!-- No hay datos -->
+    <div class="empty-state" *ngIf="filteredTodos.length === 0">
+      <div class="empty-icon">✓</div>
+      <p class="empty-title">Todo al día</p>
+      <p class="empty-subtitle">No hay tareas en esta categoría</p>
+    </div>
   </div>
+
+  <!-- Swipe hint -->
+<div class="swipe-hint" *ngIf="showSwipeHint" (click)="dismissHint()">
+  <div class="hint-card">
+    <div class="hint-animation">
+      <div class="hint-task-preview">
+        <div class="hint-check"></div>
+        <div class="hint-lines">
+          <div class="hint-line long"></div>
+          <div class="hint-line short"></div>
+        </div>
+      </div>
+      <div class="swipe-arrow">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </div>
+      <div class="hint-delete-preview">
+        <ion-icon name="trash-outline"></ion-icon>
+      </div>
+    </div>
+    <p class="hint-text">Desliza hacia la izquierda para eliminar una tarea</p>
+    <span class="hint-dismiss">Toca para cerrar</span>
+  </div>
+</div>
 
 </ion-content>

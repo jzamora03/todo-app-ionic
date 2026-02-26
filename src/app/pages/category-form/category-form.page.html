@@ -1,45 +1,55 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/categories"></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ isEditing ? 'Editar' : 'Nueva' }} Categoría</ion-title>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="header-content">
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/categories" text=""></ion-back-button>
+      </ion-buttons>
+      <h1 class="header-title">{{ isEditing ? 'Editar' : 'Nueva' }} Categoría</h1>
+      <div style="width:48px"></div>
+    </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-item>
-    <ion-label position="floating">Nombre</ion-label>
-    <ion-input [(ngModel)]="name" placeholder="Ej: Trabajo, Personal..."></ion-input>
-  </ion-item>
+<ion-content>
+  <div class="form-wrapper">
 
-  <ion-item class="ion-margin-top" lines="none">
-    <ion-label>Color</ion-label>
-  </ion-item>
-
-  <div class="color-picker">
-    <div
-      *ngFor="let c of colors"
-      class="color-dot"
-      [style.background]="c"
-      [class.selected]="color === c"
-      (click)="color = c">
+    <!-- Preview -->
+    <div class="preview-card">
+      <div class="preview-badge" [style.background]="color + '20'" [style.color]="color">
+        <span class="preview-dot" [style.background]="color"></span>
+        {{ name || 'Nombre de categoría' }}
+      </div>
     </div>
-  </div>
 
-  <!-- Preview -->
-  <div class="preview ion-margin-top">
-    <ion-chip [style.--background]="color" style="--color: white">
-      <ion-icon name="pricetag"></ion-icon>
-      <ion-label>{{ name || 'Nombre de categoría' }}</ion-label>
-    </ion-chip>
-  </div>
+    <!-- Nombre -->
+    <div class="field-card">
+      <label class="field-label">Nombre</label>
+      <ion-input
+        class="field-input"
+        [(ngModel)]="name"
+        placeholder="Ej: Trabajo, Personal...">
+      </ion-input>
+    </div>
 
-  <ion-button
-    expand="block"
-    class="ion-margin-top"
-    (click)="save()"
-    [disabled]="!name.trim()">
-    {{ isEditing ? 'Guardar cambios' : 'Crear categoría' }}
-  </ion-button>
+    <!-- Color -->
+    <div class="field-card">
+      <label class="field-label">Color</label>
+      <div class="color-grid">
+        <button
+          *ngFor="let c of colors"
+          class="color-dot"
+          [class.selected]="color === c"
+          [style.background]="c"
+          (click)="color = c">
+          <ion-icon name="checkmark" *ngIf="color === c"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Botón -->
+    <button class="save-btn" (click)="save()" [disabled]="!name.trim()">
+      {{ isEditing ? 'Guardar cambios' : 'Crear categoría' }}
+    </button>
+
+  </div>
 </ion-content>
