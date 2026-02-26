@@ -1,9 +1,14 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component, OnInit, OnDestroy,
+  ChangeDetectionStrategy, ChangeDetectorRef
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { IonicModule, AlertController } from '@ionic/angular';
-import { combineLatest } from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { TodoService } from '../../services/todo.service';
 import { CategoryService } from '../../services/category.service';
 import { Todo } from '../../models/todo.model';
@@ -15,20 +20,20 @@ import { RemoteConfigService } from 'src/app/services/remote-config.service';
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, RouterModule],
+  imports: [CommonModule, FormsModule, IonicModule, RouterModule, ScrollingModule],
   changeDetection: ChangeDetectionStrategy.OnPush
-
 })
-
-
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
   todos: Todo[] = [];
   categories: Category[] = [];
   filteredTodos: Todo[] = [];
   selectedCategoryId: string | null = null;
   newTodoText: string = '';
   selectedNewTodoCategoryId: string | null = null;
+  showSwipeHint = false;
 
+  // Subject para limpiar subscripciones y evitar memory leaks
+  private destroy$ = new Subject<void>();
 
   constructor(
     private todoService: TodoService,
@@ -36,21 +41,26 @@ export class HomePage implements OnInit {
     private alertCtrl: AlertController,
     private cdr: ChangeDetectorRef,
     public remoteConfigService: RemoteConfigService
-  ) { }
+  ) {}
 
-  showSwipeHint = false;
   get greeting(): string {
     const hour = new Date().getHours();
     if (hour < 12) return 'buenos días ☀️';
-    if (hour < 18) return 'buenas tardes 🌤️ ';
+    if (hour < 18) return 'buenas tardes 🌤️';
     return 'buenas noches 🌙';
+  }
+
+  get completedCount(): number {
+    return this.todos.filter(t => t.completed).length;
   }
 
   ngOnInit() {
     combineLatest([
       this.todoService.todos$,
       this.categoryService.categories$
-    ]).subscribe(([todos, categories]) => {
+    ])
+    .pipe(takeUntil(this.destroy$)) // evita memory leaks
+    .subscribe(([todos, categories]) => {
       this.todos = todos;
       this.categories = categories;
       this.applyFilter();
@@ -58,8 +68,11 @@ export class HomePage implements OnInit {
     });
   }
 
-
-
+  // Limpia subscripciones al destruir el componente
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   applyFilter() {
     this.filteredTodos = !this.selectedCategoryId
@@ -77,7 +90,7 @@ export class HomePage implements OnInit {
       this.todoService.add(this.newTodoText.trim(), this.selectedNewTodoCategoryId);
       this.newTodoText = '';
 
-      // Mostrar hint solo la primera vez
+      // Mostrar hint solo la primera vez que se agrega una tarea
       const hintShown = localStorage.getItem('swipe_hint_shown');
       if (!hintShown && this.todos.length === 1) {
         setTimeout(() => {
@@ -94,17 +107,16 @@ export class HomePage implements OnInit {
     this.cdr.markForCheck();
   }
 
-  toggleTodo(todo: Todo) { this.todoService.toggle(todo.id); }
+  toggleTodo(todo: Todo) {
+    this.todoService.toggle(todo.id);
+  }
 
   async deleteTodo(todo: Todo) {
     const alert = await this.alertCtrl.create({
       header: 'Eliminar tarea',
       message: `¿Deseas eliminar "${todo.text}"?`,
       buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
+        { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Eliminar',
           role: 'destructive',
@@ -119,12 +131,8 @@ export class HomePage implements OnInit {
     return id ? this.categories.find(c => c.id === id) : undefined;
   }
 
-  get completedCount(): number {
-    return this.todos.filter(t => t.completed).length;
+  // trackBy evita re-creación innecesaria de elementos del DOM
+  trackById(_: number, item: Todo) {
+    return item.id;
   }
-
-
-
-
-  trackById(_: number, item: Todo) { return item.id; }
 }

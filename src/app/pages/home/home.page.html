@@ -3,7 +3,7 @@
     <div class="header-content">
       <div class="header-left">
         <p class="header-greeting">Hola, {{ greeting }}</p>
-        <h1 class="header-title">Mis Tareas</h1>
+        <h1 class="header-title">Mis tareas</h1>
       </div>
       <ion-button fill="clear" routerLink="/categories" class="categories-btn">
         <ion-icon name="pricetags-outline"></ion-icon>
@@ -13,7 +13,8 @@
 </ion-header>
 
 <ion-content>
-  <!-- Feature Flag Firebase-->
+
+  <!-- Feature Flag Firebase -->
   <div class="stats-wrapper" *ngIf="remoteConfigService.showStatistics$ | async">
     <div class="stats-card">
       <div class="stat">
@@ -46,7 +47,6 @@
         *ngFor="let cat of categories"
         class="filter-chip"
         [class.active]="selectedCategoryId === cat.id"
-        [style.--chip-color]="cat.color"
         (click)="filterBy(cat.id)">
         <span class="chip-dot" [style.background]="cat.color"></span>
         {{ cat.name }}
@@ -81,38 +81,40 @@
     </div>
   </div>
 
-  <!-- Lista -->
+  <!-- Lista con Virtual Scroll para manejo eficiente de grandes cantidades de tareas -->
   <div class="tasks-wrapper">
     <p class="tasks-count" *ngIf="filteredTodos.length > 0">
       {{ filteredTodos.length }} tarea{{ filteredTodos.length !== 1 ? 's' : '' }}
     </p>
 
-    <ion-item-sliding *ngFor="let todo of filteredTodos; trackBy: trackById">
-      <ion-item class="task-item" lines="none">
-        <div class="task-check" slot="start">
-          <button
-            class="check-btn"
-            [class.checked]="todo.completed"
-            (click)="toggleTodo(todo)">
-            <ion-icon name="checkmark" *ngIf="todo.completed"></ion-icon>
-          </button>
-        </div>
-        <div class="task-content">
-          <p class="task-text" [class.done]="todo.completed">{{ todo.text }}</p>
-          <div class="task-category" *ngIf="getCategoryById(todo.categoryId) as cat">
-            <span class="cat-dot" [style.background]="cat.color"></span>
-            <span class="cat-name">{{ cat.name }}</span>
+    <cdk-virtual-scroll-viewport itemSize="72" class="virtual-scroll">
+      <ion-item-sliding *cdkVirtualFor="let todo of filteredTodos; trackBy: trackById">
+        <ion-item class="task-item" lines="none">
+          <div class="task-check" slot="start">
+            <button
+              class="check-btn"
+              [class.checked]="todo.completed"
+              (click)="toggleTodo(todo)">
+              <ion-icon name="checkmark" *ngIf="todo.completed"></ion-icon>
+            </button>
           </div>
-        </div>
-      </ion-item>
-      <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="deleteTodo(todo)">
-          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
+          <div class="task-content">
+            <p class="task-text" [class.done]="todo.completed">{{ todo.text }}</p>
+            <div class="task-category" *ngIf="getCategoryById(todo.categoryId) as cat">
+              <span class="cat-dot" [style.background]="cat.color"></span>
+              <span class="cat-name">{{ cat.name }}</span>
+            </div>
+          </div>
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="deleteTodo(todo)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </cdk-virtual-scroll-viewport>
 
-    <!-- No hay datos -->
+    <!-- Empty state -->
     <div class="empty-state" *ngIf="filteredTodos.length === 0">
       <div class="empty-icon">✓</div>
       <p class="empty-title">Todo al día</p>
@@ -120,29 +122,29 @@
     </div>
   </div>
 
-  <!-- Swipe -->
-<div class="swipe-hint" *ngIf="showSwipeHint" (click)="dismissHint()">
-  <div class="hint-card">
-    <div class="hint-animation">
-      <div class="hint-task-preview">
-        <div class="hint-check"></div>
-        <div class="hint-lines">
-          <div class="hint-line long"></div>
-          <div class="hint-line short"></div>
+  <!-- Swipe hint - aparece solo la primera vez -->
+  <div class="swipe-hint" *ngIf="showSwipeHint" (click)="dismissHint()">
+    <div class="hint-card">
+      <div class="hint-animation">
+        <div class="hint-task-preview">
+          <div class="hint-check"></div>
+          <div class="hint-lines">
+            <div class="hint-line long"></div>
+            <div class="hint-line short"></div>
+          </div>
+        </div>
+        <div class="swipe-arrow">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+          <ion-icon name="arrow-back-outline"></ion-icon>
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </div>
+        <div class="hint-delete-preview">
+          <ion-icon name="trash-outline"></ion-icon>
         </div>
       </div>
-      <div class="swipe-arrow">
-        <ion-icon name="arrow-back-outline"></ion-icon>
-        <ion-icon name="arrow-back-outline"></ion-icon>
-        <ion-icon name="arrow-back-outline"></ion-icon>
-      </div>
-      <div class="hint-delete-preview">
-        <ion-icon name="trash-outline"></ion-icon>
-      </div>
+      <p class="hint-text">Desliza hacia la izquierda para eliminar una tarea</p>
+      <span class="hint-dismiss">Toca para cerrar</span>
     </div>
-    <p class="hint-text">Desliza hacia la izquierda para eliminar una tarea</p>
-    <span class="hint-dismiss">Toca para cerrar</span>
   </div>
-</div>
 
 </ion-content>

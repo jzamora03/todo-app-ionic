@@ -463,3 +463,8 @@ ion-item-sliding {
   from { transform: scale(0); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+
+.virtual-scroll {
+  height: 60vh;
+  width: 100%;
+}
