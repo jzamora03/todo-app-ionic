@@ -19,6 +19,8 @@ import { RemoteConfigService } from 'src/app/services/remote-config.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 
 })
+
+
 export class HomePage implements OnInit {
   todos: Todo[] = [];
   categories: Category[] = [];
@@ -37,6 +39,12 @@ export class HomePage implements OnInit {
   ) { }
 
   showSwipeHint = false;
+  get greeting(): string {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'buenos días ☀️';
+    if (hour < 18) return 'buenas tardes 🌤️ ';
+    return 'buenas noches 🌙';
+  }
 
   ngOnInit() {
     combineLatest([
@@ -49,6 +57,8 @@ export class HomePage implements OnInit {
       this.cdr.markForCheck();
     });
   }
+
+
 
 
   applyFilter() {
@@ -84,15 +94,26 @@ export class HomePage implements OnInit {
     this.cdr.markForCheck();
   }
 
-  // addTodo() {
-  //   if (this.newTodoText.trim()) {
-  //     this.todoService.add(this.newTodoText.trim(), this.selectedNewTodoCategoryId);
-  //     this.newTodoText = '';
-  //   }
-  // }
-
   toggleTodo(todo: Todo) { this.todoService.toggle(todo.id); }
-  deleteTodo(todo: Todo) { this.todoService.delete(todo.id); }
+
+  async deleteTodo(todo: Todo) {
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar tarea',
+      message: `¿Deseas eliminar "${todo.text}"?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: () => this.todoService.delete(todo.id)
+        }
+      ]
+    });
+    await alert.present();
+  }
 
   getCategoryById(id: string | null): Category | undefined {
     return id ? this.categories.find(c => c.id === id) : undefined;

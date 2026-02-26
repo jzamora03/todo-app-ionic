@@ -11,6 +11,11 @@
   --shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 
+// ── Content ─────────────────────────────────────
+ion-content {
+  --background: var(--bg);
+}
+
 // ── Header ──────────────────────────────────────
 ion-toolbar {
   --background: var(--bg);
@@ -42,16 +47,38 @@ ion-toolbar {
 }
 
 .categories-btn {
-  --color: var(--text-secondary);
+  --color: var(--text-primary);
   --padding-start: 8px;
   --padding-end: 8px;
-  margin-top: 8px;
-  font-size: 22px;
+  font-size: 26px;
+  background: var(--surface);
+  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  margin-top: 4px;
+  box-shadow: var(--shadow);
 }
 
-// ── Content ─────────────────────────────────────
-ion-content {
-  --background: var(--bg);
+.header-greeting {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 2px;
+  letter-spacing: 0.3px;
+}
+
+.header-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px 12px;
 }
 
 // ── Stats ───────────────────────────────────────

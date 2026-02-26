@@ -1,14 +1,18 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="header-content">
+      <div class="header-left">
+        <p class="header-greeting">Hola, {{ greeting }}</p>
+        <h1 class="header-title">Mis Tareas</h1>
+      </div>
       <ion-button fill="clear" routerLink="/categories" class="categories-btn">
         <ion-icon name="pricetags-outline"></ion-icon>
       </ion-button>
     </div>
   </ion-toolbar>
 </ion-header>
-<ion-content>
 
+<ion-content>
   <!-- Feature Flag Firebase-->
   <div class="stats-wrapper" *ngIf="remoteConfigService.showStatistics$ | async">
     <div class="stats-card">
@@ -116,7 +120,7 @@
     </div>
   </div>
 
-  <!-- Swipe hint -->
+  <!-- Swipe -->
 <div class="swipe-hint" *ngIf="showSwipeHint" (click)="dismissHint()">
   <div class="hint-card">
     <div class="hint-animation">
