@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/categories"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEditing ? 'Editar' : 'Nueva' }} Categoría</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-label position="floating">Nombre</ion-label>
+    <ion-input [(ngModel)]="name" placeholder="Ej: Trabajo, Personal..."></ion-input>
+  </ion-item>
+
+  <ion-item class="ion-margin-top" lines="none">
+    <ion-label>Color</ion-label>
+  </ion-item>
+
+  <div class="color-picker">
+    <div
+      *ngFor="let c of colors"
+      class="color-dot"
+      [style.background]="c"
+      [class.selected]="color === c"
+      (click)="color = c">
+    </div>
+  </div>
+
+  <!-- Preview -->
+  <div class="preview ion-margin-top">
+    <ion-chip [style.--background]="color" style="--color: white">
+      <ion-icon name="pricetag"></ion-icon>
+      <ion-label>{{ name || 'Nombre de categoría' }}</ion-label>
+    </ion-chip>
+  </div>
+
+  <ion-button
+    expand="block"
+    class="ion-margin-top"
+    (click)="save()"
+    [disabled]="!name.trim()">
+    {{ isEditing ? 'Guardar cambios' : 'Crear categoría' }}
+  </ion-button>
+</ion-content>
